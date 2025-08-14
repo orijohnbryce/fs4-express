@@ -1,7 +1,7 @@
 export type Car = {
     year: number,
     price: number,
-    model: string,
+    name: string,
     id: number,
     engine: number,
     km: number,
