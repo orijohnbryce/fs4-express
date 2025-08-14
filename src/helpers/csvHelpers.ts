@@ -12,8 +12,8 @@ export async function loadCars(): Promise<Car[]> {
 }
 
 async function writeCars(cars: Car[]): Promise<void> {
-    const data = stringify(cars, { header: true });
-    fs.writeFile(carsFile, data, "utf-8");
+    const data = stringify(cars, { header: true, eof: false });
+    await fs.writeFile(carsFile.trim(), data, "utf-8");
 }
 
 export async function addCar(car: Car): Promise<void> {
@@ -24,4 +24,13 @@ export async function addCar(car: Car): Promise<void> {
         console.log(error);
         throw error;
     }
+}
+
+export async function deleteCar(id: number) {
+    const allCars = await loadCars()
+    const filteredCars = allCars.filter(c=>c.id !== id);
+    if (allCars.length !== filteredCars.length)
+        await writeCars(filteredCars)
+
+    // todo: maybe throw exception if not exists
 }
