@@ -1,19 +1,41 @@
 import express, { NextFunction, Request, Response } from "express"
 import { addCar, deleteCar, loadCars } from "./helpers/csvHelpers"
 import { Car } from "./types"
+import { logIt } from "./helpers/logHelpers"
 
 
 const server = express()
 
 server.use(express.json()) // load body into "request" object
 
+server.use((req: Request, res: Response, next: NextFunction) => {
+    const time = new Date().toISOString();
+    const ipv6 = req.ip;
+
+    // convert to ipv4
+    const ip = ipv6 === '::1' ? '127.0.0.1' : ipv6.replace(/^::ffff:/, '');
+
+
+    res.on("finish", async () => {
+        const logMsg = `[${time}]: ${ip} ${req.method} ${req.originalUrl} ${res.statusCode}`
+        await logIt(logMsg);
+    })
+    
+    res.on("close", ()=>{
+        const logMsg = `[${time}]: ${ip} ${req.method} ${req.originalUrl} CONNECTION LOST`
+        logIt(logMsg);
+    })
+    next();
+})
+
 server.get("/api/v1/cars", async (request: Request, response: Response, next: NextFunction) => {
     const cars = await loadCars();
-    // response.status(200).json(cars);    
-    console.log("hello from get all cars");
-    next();
-    console.log("after next!");
-    
+    response.status(200).json(cars);
+
+    // console.log("hello from get all cars");
+    // next();
+    // console.log("after next!");
+
 })
 
 server.get("/api/v1/cars/:id", async (request: Request, response: Response, next: NextFunction) => {
@@ -41,7 +63,7 @@ server.post("/api/v1/car", async (req: Request, res: Response, next: NextFunctio
         res.status(500).send("some error, please retry later .. ")
         return;
     }
-    res.status(200).send("OK")
+    res.status(201).send("OK")
 })
 
 server.put("/api/v1/car/:id", async (req: Request, res: Response, next: NextFunction) => {
@@ -56,12 +78,12 @@ server.put("/api/v1/car/:id", async (req: Request, res: Response, next: NextFunc
 
 server.delete("/api/v1/car/:id", async (req: Request, res: Response, next: NextFunction) => {
     await deleteCar(+req.params.id);
-    res.status(200).send("deleted")
+    res.status(204).send("deleted")
 })
 
 server.use("", async (req: Request, res: Response, next: NextFunction) => {
     console.log("At use *");
-    
+
     res.send("ok")
     // res.status(404).send(`route ${req.originalUrl} not found`)
 })
