@@ -2,54 +2,61 @@ import express, { NextFunction, Request, Response } from "express"
 import { addCar, deleteCar, loadCars } from "./helpers/csvHelpers"
 import { Car } from "./types"
 import { logIt } from "./helpers/logHelpers"
+import { logMiddleware } from "./middlewares/logMiddleware"
+import { doorManMW } from "./middlewares/doormanMiddleware"
 
 
 const server = express()
 
 server.use(express.json()) // load body into "request" object
 
-server.use((req: Request, res: Response, next: NextFunction) => {
-    const time = new Date().toISOString();
-    const ipv6 = req.ip;
-
-    // convert to ipv4
-    const ip = ipv6 === '::1' ? '127.0.0.1' : ipv6.replace(/^::ffff:/, '');
+server.use(logMiddleware)
+// server.use(doorManMW)  // uncomment on production
 
 
-    res.on("finish", async () => {
-        const logMsg = `[${time}]: ${ip} ${req.method} ${req.originalUrl} ${res.statusCode}`
-        await logIt(logMsg);
-    })
-    
-    res.on("close", ()=>{
-        const logMsg = `[${time}]: ${ip} ${req.method} ${req.originalUrl} CONNECTION LOST`
-        logIt(logMsg);
-    })
+const extraMw = (request: Request, response: Response, next: NextFunction)=>{
+    console.log("This is extra MW");
     next();
-})
+}
 
-server.get("/api/v1/cars", async (request: Request, response: Response, next: NextFunction) => {
+
+server.get("/api/v1/cars", extraMw, async (request: Request, response: Response, next: NextFunction) => {
+
+    console.log(request.query);
+    const min = request.query.min ? +request.query.min : -Infinity
+    const max = request.query.max ? +request.query.max : Infinity
+    const q = request.query.q ? (request.query.q as string).toLowerCase() : ""
+
     const cars = await loadCars();
-    response.status(200).json(cars);
-
-    // console.log("hello from get all cars");
-    // next();
-    // console.log("after next!");
-
+    const res = cars.filter((c: Car) => c.price > min 
+                                        && c.price < max 
+                                        && c.name.toLowerCase().includes(q));
+    response.status(200).json(res);
 })
+
+server.get("/api/v1/cars/search/:q", async (request: Request, response: Response, next: NextFunction) => {
+    const cars = await loadCars();
+    const res = cars.filter((c: Car) => c.name.toLowerCase().includes(request.params.q.toLowerCase()))
+    response.status(200).json(res);
+})
+
 
 server.get("/api/v1/cars/:id", async (request: Request, response: Response, next: NextFunction) => {
-    const id = +request.params.id;
-    const cars = await loadCars();
-    const car = cars.filter((c) => c.id === id)
-    if (car.length === 0)
-        response.status(404).send("car-id not found");
-    else
-        response.status(200).json(car[0]);
+    if (request.params.id) {
+        const id = +request.params.id;
+        const cars = await loadCars();
+        const car = cars.filter((c) => c.id === id)
+        if (car.length === 0)
+            response.status(404).send("car-id not found");
+        else
+            response.status(200).json(car[0]);
+    }
+    else {
+        response.status(200).json({});
+    }
 })
 
-
-server.post("/api/v1/car", async (req: Request, res: Response, next: NextFunction) => {
+server.post("/api/v1/car", extraMw, async (req: Request, res: Response, next: NextFunction) => {
 
     // TODO: validate body is valid CAR object
     /*
@@ -61,7 +68,8 @@ server.post("/api/v1/car", async (req: Request, res: Response, next: NextFunctio
         await addCar(req.body as Car)
     } catch (error) {
         res.status(500).send("some error, please retry later .. ")
-        return;
+        return; // must be here, to avoid double return. 
+        // (or move res.status(200) to be before the catch section)
     }
     res.status(201).send("OK")
 })
@@ -81,11 +89,8 @@ server.delete("/api/v1/car/:id", async (req: Request, res: Response, next: NextF
     res.status(204).send("deleted")
 })
 
-server.use("", async (req: Request, res: Response, next: NextFunction) => {
-    console.log("At use *");
-
-    res.send("ok")
-    // res.status(404).send(`route ${req.originalUrl} not found`)
+server.use(async (req: Request, res: Response, next: NextFunction) => {
+    res.status(404).send(`route ${req.originalUrl} not found!`)
 })
 
 server.listen(3030, () => {
