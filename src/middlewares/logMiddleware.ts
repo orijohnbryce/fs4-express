@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { logIt } from "../helpers/logHelpers";
+import { logIt } from "../utils/helpers/logHelpers";
 
 export const logMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const time = new Date().toLocaleString("en-IL", { timeZone: "Asia/Jerusalem" });

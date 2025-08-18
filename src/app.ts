@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express"
-import { addCar, deleteCar, loadCars } from "./helpers/csvHelpers"
+import { addCar, deleteCar, loadCars } from "./utils/helpers/csvHelpers"
 import { Car } from "./types"
-import { logIt } from "./helpers/logHelpers"
+import { logIt } from "./utils/helpers/logHelpers"
 import { logMiddleware } from "./middlewares/logMiddleware"
 import { doorManMW } from "./middlewares/doormanMiddleware"
 import { carValidationMW } from "./middlewares/carValidation"
@@ -40,7 +40,6 @@ server.get("/api/v1/cars/search/:q", async (request: Request, response: Response
     const res = cars.filter((c: Car) => c.name.toLowerCase().includes(request.params.q.toLowerCase()))
     response.status(200).json(res);
 })
-
 
 server.get("/api/v1/cars/:id", async (request: Request, response: Response, next: NextFunction) => {
     if (request.params.id) {
