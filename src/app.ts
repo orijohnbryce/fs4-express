@@ -4,6 +4,7 @@ import { Car } from "./types"
 import { logIt } from "./helpers/logHelpers"
 import { logMiddleware } from "./middlewares/logMiddleware"
 import { doorManMW } from "./middlewares/doormanMiddleware"
+import { carValidationMW } from "./middlewares/carValidation"
 
 
 const server = express()
@@ -56,7 +57,7 @@ server.get("/api/v1/cars/:id", async (request: Request, response: Response, next
     }
 })
 
-server.post("/api/v1/car", extraMw, async (req: Request, res: Response, next: NextFunction) => {
+server.post("/api/v1/car", carValidationMW, async (req: Request, res: Response, next: NextFunction) => {
 
     // TODO: validate body is valid CAR object
     /*
@@ -74,7 +75,7 @@ server.post("/api/v1/car", extraMw, async (req: Request, res: Response, next: Ne
     res.status(201).send("OK")
 })
 
-server.put("/api/v1/car/:id", async (req: Request, res: Response, next: NextFunction) => {
+server.put("/api/v1/car/:id", carValidationMW, async (req: Request, res: Response, next: NextFunction) => {
 
     // try..
 
