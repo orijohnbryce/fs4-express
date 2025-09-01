@@ -1,4 +1,21 @@
-import { Database as DB, RunResult } from "better-sqlite3";
+import Database, { Database as DB, RunResult } from "better-sqlite3";
+import path from "path";
+import fs from "fs";
+import { DB_FILE } from "../utils/config";
+
+export function openDb(dbFile = DB_FILE): DB {
+    const full = path.resolve(process.cwd(), dbFile);
+    if (!fs.existsSync(full)) fs.writeFileSync(full, "");
+    const db = new Database(full, {
+      fileMustExist: false,
+      verbose: undefined, // set to console.log to see queries
+    });
+    
+    db.pragma("foreign_keys = ON");
+  
+    return db;
+  }
+
 
 export function runQuery(
     db: DB,
