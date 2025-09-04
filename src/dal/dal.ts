@@ -46,4 +46,6 @@ export async function runQuery(
         const res: RunResult = stmt.run();
         return { changes: res.changes, lastInsertRowid: res.lastInsertRowid };
     }
+
+    // TODO: db.close()
 }
