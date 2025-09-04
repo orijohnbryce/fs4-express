@@ -3,6 +3,7 @@ import path from "path";
 import { APP_PORT, routesPrefix } from "./utils/config";
 import { productRouter } from "./controllers/productControllers";
 import { init_db } from "./db/init_db";
+import { openDb, runQuery } from "./db/dal";
 
 
 const server = express()
@@ -12,6 +13,7 @@ server.use(express.json()) // load body into "request" object
 // register routers
 server.use(routesPrefix, productRouter);
 
+
 server.use((request: Request, response: Response, next: NextFunction) => {        
     console.log("No route found for", request.url);
     
@@ -19,5 +21,8 @@ server.use((request: Request, response: Response, next: NextFunction) => {
 })
 
 // init_db();
+
+
+
 
 server.listen(APP_PORT, () => console.log(`Express server started.\nhttp://localhost:${APP_PORT}`));
