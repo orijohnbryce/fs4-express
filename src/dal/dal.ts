@@ -12,8 +12,8 @@ export async function openDb(dbFile: string = DB_FILE): DB {
     const db = new Database(dbFile,
         {
             fileMustExist: false,
-            // verbose: undefined   // do we want to see the queries? could be set to console.log            
-            verbose: console.log
+            verbose: undefined   // do we want to see the queries? could be set to console.log            
+            // verbose: console.log
         });
 
     return db;
