@@ -1,10 +1,10 @@
 import fs from "fs";
 import Database, { Database as DB, RunResult } from "better-sqlite3";
-import { DB_FILE } from "../config";
+import { DB_FILE } from "../utils/config";
 
 
-export function openDb(dbFile:string = DB_FILE): DB {
-    
+export async function openDb(dbFile: string = DB_FILE): DB {
+
     if (!fs.existsSync(dbFile)) {
         fs.writeFileSync(dbFile, "");
     }
@@ -19,12 +19,12 @@ export function openDb(dbFile:string = DB_FILE): DB {
     return db;
 }
 
-export function runQuery(    
+export async function runQuery(
     sql: string,
     // params: Record<string, unknown> | unknown[] = []
-): unknown[] | { changes: number; lastInsertRowid: number | bigint } {
+): Promise<unknown[] | { changes: number; lastInsertRowid: number | bigint }> {
 
-    const db = openDb();
+    const db = await openDb();
     const stmt = db.prepare(sql);  // compiles an SQL statement.
 
     // .run() / .all() / .get() → belong to a prepared statement (db.prepare(sql)),
