@@ -2,3 +2,4 @@ log.log
 node_modules/
 package-lock.json
 echo.txt
+ttd*

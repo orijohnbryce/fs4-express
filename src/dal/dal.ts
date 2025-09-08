@@ -24,6 +24,12 @@ export async function runQuery(
     // params: Record<string, unknown> | unknown[] = []
 ): Promise<unknown[] | { changes: number; lastInsertRowid: number | bigint }> {
 
+
+    console.log("about to run:");
+    console.log(sql);
+
+    
+
     const db = await openDb();
     const stmt = db.prepare(sql);  // compiles an SQL statement.
 

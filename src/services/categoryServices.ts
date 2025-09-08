@@ -49,4 +49,4 @@ export async function getAllCategories() {
     return buildHierarchy(categories)    
 }
 
-getAllCategories().then((r) => console.log(r));
+getAllCategories().then((r) => console.log(JSON.stringify (r)));
