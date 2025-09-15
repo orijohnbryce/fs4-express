@@ -16,7 +16,7 @@ interface CreateOrderDTO {
     products: OrderProductDTO[];
 }
 
-export async function createOrder(data: CreateOrderDTO) {
+export async function createOrder(data: CreateOrderDTO): Promise<number> {
 
     // create order record
     const orderQ = `
@@ -58,6 +58,6 @@ export async function createOrder(data: CreateOrderDTO) {
     return orderId;
 
 }
-
-createOrder({ customerId: 2, products: [{ productId: 5, qty: 2 }] })
-    .then((oid) => console.log(oid))
+// const data = { customerId: 2, products: [{ productId: 5, qty: 2 }] }
+// createOrder(data)
+//     .then((oid) => console.log(oid))
