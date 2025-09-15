@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express"
-import { createOrder } from "../services/orderServices";
+import { createOrder, getOrderByCustomerId, getOrderProducts } from "../services/orderServices";
 import { OrderStatus } from "../types/types";
+import { StatusCode } from "../models/statusCode";
 
 
 export const orderRoutes = express.Router();
@@ -18,10 +19,29 @@ orderRoutes.post("/order", async (req: Request, res: Response, next: NextFunctio
         };
 
         const newOrderId = await createOrder(data);
-        res.send(`Order created. id: ${newOrderId}`);
+        res.status(StatusCode.Ok).send(`Order created. id: ${newOrderId}`);
     } catch (error) {
         console.log(error);
-        res.status(500).json(error);
+        res.status(StatusCode.ServerError).json(error);
     }
 
 })
+
+orderRoutes.get("/customer-orders/:id", 
+    async (req: Request, res: Response, next: NextFunction)=>{
+
+        const customerId = Number(req.params.id);
+        const returnData = {}
+        const orders = await getOrderByCustomerId(customerId);
+
+        for (const o of orders) {
+            const orderProducts = await getOrderProducts(o.id);
+            returnData[o.id] = {
+                orderDate: o.orderDate,
+                status: o.status,
+                note: o.note,
+                products: orderProducts
+            };
+        }
+        res.status(StatusCode.Ok).json(returnData);       
+    })

@@ -97,4 +97,4 @@ export async function getOrderProducts(orderId: number): Promise<any[]> {
 // createOrder(data)
 //     .then((oid) => console.log(oid))
 
-getOrderProducts(11).then((res)=>{console.log(res)})
+// getOrderProducts(11).then((res)=>{console.log(res)})
