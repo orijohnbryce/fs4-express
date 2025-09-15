@@ -3,11 +3,11 @@ import { OrderStatus } from "../types/types";
 export class OrderModel {
     id?: number;
     customerId: number;
-    address?: string;
     orderDate: Date;
     status: OrderStatus;
+    address?: string;
     note?: string;
-
+    
     constructor(
         id: number | undefined,
         customerId: number,

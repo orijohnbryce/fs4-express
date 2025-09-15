@@ -6,6 +6,7 @@ export default class ProductModel {
     price: number;
     stock: number;
     description?: string;
+    
 
     constructor(
         id: number | undefined,

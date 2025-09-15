@@ -1,4 +1,6 @@
 import { runQuery } from "../dal/dal";
+import { OrderModel } from "../models/OrderModel";
+import ProductModel from "../models/ProductModel";
 import { OrderStatus } from "../types/types";
 
 interface OrderProductDTO {
@@ -58,6 +60,41 @@ export async function createOrder(data: CreateOrderDTO): Promise<number> {
     return orderId;
 
 }
+
+
+export async function getOrderByCustomerId(customerId: number): Promise<OrderModel[]> {
+    const q = `SELECT * FROM orders WHERE customer_id = ${customerId} `;
+    const res = await runQuery(q) as any[];
+
+    const orders = res.map((o) => {
+        return new OrderModel(o.id,
+            o.customer_id,
+            o.order_date,
+            o.status,
+            o.address,
+            o.note
+        )
+    })
+
+    return orders;
+}
+
+
+export async function getOrderProducts(orderId: number): Promise<any[]> {
+    const q = `SELECT p.*, op.price as actual_price, op.qty as qty 
+                FROM product p
+                JOIN orders_product op
+                ON p.id = op.product_id
+                WHERE op.order_id = ${orderId}`;
+    
+    
+    const res = await runQuery(q) as any[];
+    return res;
+}
+
+
 // const data = { customerId: 2, products: [{ productId: 5, qty: 2 }] }
 // createOrder(data)
 //     .then((oid) => console.log(oid))
+
+getOrderProducts(11).then((res)=>{console.log(res)})
