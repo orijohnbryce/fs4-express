@@ -41,9 +41,10 @@ export async function getProducts(name?: string, minPrice?: number, maxPrice?: n
 
     if (categoryId != undefined) {
         const categoryIds = await getAllCategoriesById(categoryId);
-        q += ` JOIN product_category pc ON  pc.product_id = p.id WHERE pc.category_id IN (${categoryIds.join(",")})`;
+        q += ` JOIN product_category pc ON  pc.product_id = p.id WHERE pc.category_id IN (${categoryIds.join(",")}) AND p.is_active=1`;
+    } else {
+        q += ` WHERE p.is_active=1`
     }
-    q += ` AND p.is_active=1`
     if (name)
         q += ` AND p.name LIKE '%${name}%'`
 
@@ -89,7 +90,7 @@ export async function addProduct(product: Omit<ProductModel, 'id'>) {
     return res.lastInsertRowid;
 }
 
-export async function updateProduct(p : ProductModel) {
+export async function updateProduct(p: ProductModel) {
     const q = `
     UPDATE product SET 
     sku = ${p.sku},
