@@ -49,4 +49,21 @@ export async function getAllCategories() {
     return buildHierarchy(categories)    
 }
 
-getAllCategories().then((r) => console.log(JSON.stringify (r)));
+
+export async function getAllCategoriesById(parentCategoryId: number): Promise<number[]> {
+
+    const categoryIds = [parentCategoryId];
+
+    const q = `select id from category where parent_id = ${parentCategoryId}`;
+
+    const children = await runQuery(q) as any[];
+
+    for (const child of children) {
+        categoryIds.push(...(await getAllCategoriesById(child.id)));
+    }
+
+    return categoryIds;
+}
+
+
+// getAllCategories().then((r) => console.log(JSON.stringify (r)));

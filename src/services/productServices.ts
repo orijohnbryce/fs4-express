@@ -1,5 +1,6 @@
 import { runQuery } from "../dal/dal";
 import ProductModel from "../models/ProductModel";
+import { getAllCategoriesById } from "./categoryServices";
 
 export async function getProductById(id: number): Promise<ProductModel | null> {
     const q = `SELECT * FROM product WHERE id=${id}`
@@ -7,7 +8,9 @@ export async function getProductById(id: number): Promise<ProductModel | null> {
     const row = res[0]
 
     if (res.length == 0)
-        return null;
+        // return null;
+        throw new Error("Product not found!");
+    
 
     const p = new ProductModel(
         row.id,
@@ -21,20 +24,7 @@ export async function getProductById(id: number): Promise<ProductModel | null> {
     return p;
 }
 
-async function getAllCategoriesById(parentCategoryId: number): Promise<number[]> {
 
-    const categoryIds = [parentCategoryId];
-
-    const q = `select id from category where parent_id = ${parentCategoryId}`;
-
-    const children = await runQuery(q) as any[];
-
-    for (const child of children) {
-        categoryIds.push(...(await getAllCategoriesById(child.id)));
-    }
-
-    return categoryIds;
-}
 
 export async function getProducts(name?: string, minPrice?: number, maxPrice?: number, categoryId?: number): Promise<ProductModel[]> {
     let q = `SELECT p.* FROM product p`;
