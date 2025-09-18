@@ -1,6 +1,5 @@
 import { runQuery } from "../dal/dal";
 import { OrderModel } from "../models/OrderModel";
-import ProductModel from "../models/ProductModel";
 import { OrderStatus } from "../types/types";
 
 interface OrderProductDTO {

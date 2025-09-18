@@ -2,33 +2,35 @@ import express, { NextFunction, Request, Response } from "express"
 import { createOrder, getOrderByCustomerId, getOrderProducts } from "../services/orderServices";
 import { OrderStatus } from "../types/types";
 import { StatusCode } from "../models/statusCode";
+import { ValidationError } from "../models/exeptions";
 
 
 export const orderRoutes = express.Router();
 
 orderRoutes.post("/order", async (req: Request, res: Response, next: NextFunction) => {
 
-    try {
-        // console.log(req.body);
-        const data = {
-            customerId: req.body.customerId,
-            address: req.body.address,
-            status: req.body.status as OrderStatus,
-            notes: req.body.notes,
-            products: req.body.products,
-        };
+    const data = {
+        customerId: req.body.customerId,
+        address: req.body.address,
+        status: req.body.status as OrderStatus,
+        notes: req.body.notes,
+        products: req.body.products,
+    };
 
-        const newOrderId = await createOrder(data);
-        res.status(StatusCode.Ok).send(`Order created. id: ${newOrderId}`);
-    } catch (error) {
-        console.log(error);
-        res.status(StatusCode.ServerError).json(error);
+    if (typeof (data.customerId) !== "number" ||
+        typeof (data.customerId) === undefined ||
+        data.customerId <= 0 ||
+        data.products.length < 1
+    ) { 
+        throw new ValidationError("wrong args data");        
     }
 
+    const newOrderId = await createOrder(data);
+    res.status(StatusCode.Ok).send(`Order created. id: ${newOrderId}`);
 })
 
-orderRoutes.get("/customer-orders/:id", 
-    async (req: Request, res: Response, next: NextFunction)=>{
+orderRoutes.get("/customer-orders/:id",
+    async (req: Request, res: Response, next: NextFunction) => {
 
         const customerId = Number(req.params.id);
         const returnData = {}
@@ -43,5 +45,5 @@ orderRoutes.get("/customer-orders/:id",
                 products: orderProducts
             };
         }
-        res.status(StatusCode.Ok).json(returnData);       
+        res.status(StatusCode.Ok).json(returnData);
     })

@@ -1,9 +1,7 @@
 import express, { NextFunction, Request, Response } from "express"
-import { getProductById, getProducts } from "../services/productServices";
+import { addProduct, getProductById, getProducts } from "../services/productServices";
 import { StatusCode } from "../models/statusCode";
-import { AppException } from "../models/exeptions";
-// import { StatusCode } from "../models/StatusCode";
-
+import ProductModel from "../models/ProductModel";
 
 export const productRoutes = express.Router();
 
@@ -32,3 +30,18 @@ productRoutes.get("/products", async (req: Request, res: Response, next: NextFun
         res.status(200).json(products);   
 })
 
+productRoutes.post("/products", async (req: Request, res: Response, next: NextFunction)=>{
+    
+    const newProduct = new ProductModel(
+        undefined,
+        req.body.sku,
+        req.body.name,
+        req.body.isActive ? req.body.isActive : 1,
+        req.body.price,
+        req.body.stock,
+        req.body.description
+    )
+
+    const newId = await addProduct(newProduct);
+    res.status(StatusCode.Ok).send(newId);
+})

@@ -64,18 +64,24 @@ export async function deleteProduct(productId: number): Promise<void> {
     await runQuery(q);
 }
 
-export async function addProduct(product: Omit<ProductModel, 'id'>) {
+// export async function addProduct(product: Omit<ProductModel, 'id'>) {
+export async function addProduct(product: Partial<ProductModel>) {
+    
+    product.validate();
+
     const q = `INSERT INTO product 
     (sku, name, is_active, price, stock , description)
     VALUES (
-        ${product.sku},
-        ${product.name},
+        '${product.sku}',
+        '${product.name}',
         ${product.isActive ? 1 : 0},
         ${product.price},
         ${product.stock},
         '${product.description || ''}'
     )
     `
+    console.log(q);
+    
     const res = await runQuery(q) as any;
     return res.lastInsertRowid;
 }
@@ -83,8 +89,8 @@ export async function addProduct(product: Omit<ProductModel, 'id'>) {
 export async function updateProduct(p: ProductModel) {
     const q = `
     UPDATE product SET 
-    sku = ${p.sku},
-    name = ${p.name},
+    sku = '${p.sku}',
+    name = '${p.name}',
     is_active = ${p.isActive ? 1 : 0},
     price = ${p.price},
     stock = ${p.stock},
