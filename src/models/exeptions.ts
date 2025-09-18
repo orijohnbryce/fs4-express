@@ -27,3 +27,9 @@ export class UnauthorizedError extends AppException {
         super(StatusCode.Unauthorized, message ? message : "unauthorized");
     }
 }
+
+export class NotFoundError extends AppException {
+    constructor(message: string){
+        super(StatusCode.NotFound, message);
+    }
+}

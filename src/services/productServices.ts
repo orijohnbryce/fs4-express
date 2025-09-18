@@ -1,4 +1,5 @@
 import { runQuery } from "../dal/dal";
+import { NotFoundError } from "../models/exeptions";
 import ProductModel from "../models/ProductModel";
 import { getAllCategoriesById } from "./categoryServices";
 
@@ -9,7 +10,8 @@ export async function getProductById(id: number): Promise<ProductModel | null> {
 
     if (res.length == 0)
         // return null;
-        throw new Error("Product not found!");
+        // throw new Error("Product not found!");
+        throw new NotFoundError(`Product with id ${id} not found!`)
     
 
     const p = new ProductModel(
@@ -23,8 +25,6 @@ export async function getProductById(id: number): Promise<ProductModel | null> {
     )
     return p;
 }
-
-
 
 export async function getProducts(name?: string, minPrice?: number, maxPrice?: number, categoryId?: number): Promise<ProductModel[]> {
     let q = `SELECT p.* FROM product p`;
