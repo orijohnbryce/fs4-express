@@ -5,13 +5,30 @@ import { openDb, runQuery } from "./dal";
 function initDbSchema(db: DB): void {
 
     const ddl = `
+
+
+    CREATE TABLE IF NOT EXISTS "user" (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    username TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    is_admin INTEGER NOT NULL DEFAULT 0 CHECK (is_admin IN (0,1)),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    token TEXT
+  );
+
+
+
     CREATE TABLE IF NOT EXISTS customer (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     phone TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+
+    FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS product (
@@ -81,6 +98,14 @@ CREATE INDEX IF NOT EXISTS idx_product_category ON product_category(category_id)
 }
 
 function generateSampleData() {
+    // --- users  ---
+    runQuery("INSERT INTO \"user\" (email, username, password_hash, is_admin, token) VALUES ('admin@example.com','admin','123',1,'admintoken123')");
+    runQuery("INSERT INTO \"user\" (email, username, password_hash, is_admin) VALUES ('alice@example.com','alice','123',0)");
+    runQuery("INSERT INTO \"user\" (email, username, password_hash, is_admin) VALUES ('bob@example.com','bob','123',0)");
+    runQuery("INSERT INTO \"user\" (email, username, password_hash, is_admin) VALUES ('carol@example.com','carol','123',0)");
+    runQuery("INSERT INTO \"user\" (email, username, password_hash, is_admin) VALUES ('david@example.com','david','123',0)");
+
+
 
     // --- Categories ---
     runQuery("INSERT INTO category (name) VALUES ('Electronics');");
@@ -125,10 +150,17 @@ function generateSampleData() {
     runQuery("INSERT INTO product_category (product_id, category_id) VALUES (15,3)"); //--Children Book -> Books
 
     // --- Customers ---
-    runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('Alice','Smith','alice@example.com','111-222-3333')");
-    runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('Bob','Johnson','bob@example.com','222-333-4444')");
-    runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('Carol','Williams','carol@example.com','333-444-5555')");
-    runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('David','Brown','david@example.com','444-555-6666')");
+    // runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('Alice','Smith','alice@example.com','111-222-3333')");
+    // runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('Bob','Johnson','bob@example.com','222-333-4444')");
+    // runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('Carol','Williams','carol@example.com','333-444-5555')");
+    // runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('David','Brown','david@example.com','444-555-6666')");
+    
+    // --- Customers  linked to Users ---
+    runQuery("INSERT INTO customer (user_id, first_name, last_name, email, phone) VALUES (2,'Alice','Smith','alice@example.com','111-222-3333')");
+    runQuery("INSERT INTO customer (user_id, first_name, last_name, email, phone) VALUES (3,'Bob','Johnson','bob@example.com','222-333-4444')");
+    runQuery("INSERT INTO customer (user_id, first_name, last_name, email, phone) VALUES (4,'Carol','Williams','carol@example.com','333-444-5555')");
+    runQuery("INSERT INTO customer (user_id, first_name, last_name, email, phone) VALUES (5,'David','Brown','david@example.com','444-555-6666')");
+
 
     // --- Orders ---
     runQuery("INSERT INTO orders (customer_id, address, status, note) VALUES (1,'123 Main St','new','First order by Alice')");
@@ -153,8 +185,13 @@ function generateSampleData() {
 
 console.log("Starting init DB");
 
-// generateSampleData();
-const db = openDb()
-initDbSchema(db);
+// const db = openDb()
+// initDbSchema(db);
 
-console.log("Done init DB");
+// openDb().then((db: any)=>{
+//     initDbSchema(db);
+//     console.log("Done init DB");
+// })
+
+
+generateSampleData();

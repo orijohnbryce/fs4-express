@@ -15,8 +15,10 @@
     "@types/node": "^24.2.1"
   },
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "better-sqlite3": "^12.2.0",
     "express": "^5.1.0",
-    "joi": "^18.0.1"
+    "joi": "^18.0.1",
+    "jsonwebtoken": "^9.0.2"
   }
 }

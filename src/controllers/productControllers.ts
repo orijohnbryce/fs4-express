@@ -2,10 +2,11 @@ import express, { NextFunction, Request, Response } from "express"
 import { addProduct, getProductById, getProducts } from "../services/productServices";
 import { StatusCode } from "../models/statusCode";
 import ProductModel from "../models/ProductModel";
+import { verifyTokenAdminMW, verifyTokenMW } from "../middlewares/authMiddlewares";
 
 export const productRoutes = express.Router();
 
-productRoutes.get("/products/:id", async (req: Request, res: Response, next: NextFunction) => {
+productRoutes.get("/products/:id", verifyTokenMW, async (req: Request, res: Response, next: NextFunction) => {
     try {        
         const pid = Number(req.params.id);
         if (isNaN(pid)) {
@@ -20,7 +21,7 @@ productRoutes.get("/products/:id", async (req: Request, res: Response, next: Nex
     }
 })
 
-productRoutes.get("/products", async (req: Request, res: Response, next: NextFunction) => {    
+productRoutes.get("/products",verifyTokenAdminMW, async (req: Request, res: Response, next: NextFunction) => {    
         const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
         const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
         const name = req.query.name ? String(req.query.name) : undefined;
