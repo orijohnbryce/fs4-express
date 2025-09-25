@@ -1,4 +1,4 @@
-log.log
+/logs
 node_modules/
 package-lock.json
 echo.txt

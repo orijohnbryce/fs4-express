@@ -66,7 +66,7 @@ export async function deleteProduct(productId: number): Promise<void> {
 
 // export async function addProduct(product: Omit<ProductModel, 'id'>) {
 export async function addProduct(product: Partial<ProductModel>) {
-    
+        
     product.validate();
 
     const q = `INSERT INTO product 

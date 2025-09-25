@@ -3,13 +3,17 @@ import { openDb, runQuery } from "./dal/dal";
 import { productRoutes } from "./controllers/productControllers";
 import { orderRoutes } from "./controllers/orderControllers";
 import { errorHandler } from "./middlewares/errorHandler";
+import { logMiddleware } from "./middlewares/logMiddleware";
+import { authRouter } from "./controllers/userControllers";
 
 const server = express();
 
 server.use(express.json()); // load body into "request" object
+server.use(logMiddleware)
 
 server.use(productRoutes);
 server.use(orderRoutes);
+server.use(authRouter);
 
 server.use(errorHandler);
 

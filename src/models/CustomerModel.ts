@@ -4,7 +4,7 @@ export default class CustomerModel {
     lastName: string;
     email: string;
     phone?: string;
-    createdAt: Date;
+    createdAt: Date;    
 
     constructor(
         id: number | undefined,

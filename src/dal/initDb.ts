@@ -5,13 +5,27 @@ import { openDb, runQuery } from "./dal";
 function initDbSchema(db: DB): void {
 
     const ddl = `
+
+    CREATE TABLE IF NOT EXISTS "user" (
+    id INTEGER  PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    username TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    isAdmin INTEGER NOT NULL DEFAULT 0 CHECK (isAdmin IN (0,1)),
+    token TEXT
+    );
+
+
     CREATE TABLE IF NOT EXISTS customer (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     phone TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+
+    FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS product (
@@ -124,11 +138,18 @@ function generateSampleData() {
     runQuery("INSERT INTO product_category (product_id, category_id) VALUES (14,3)"); //--Cookbook -> Books
     runQuery("INSERT INTO product_category (product_id, category_id) VALUES (15,3)"); //--Children Book -> Books
 
+    // --- users  ---
+    runQuery(`INSERT INTO "user" (email, username, password_hash, isAdmin) VALUES ('admin@email.com', 'admin', 'admin', 1)`);
+    runQuery(`INSERT INTO "user" (email, username, password_hash, isAdmin) VALUES ('u1@email.com', 'u1', '1234', 0)`);
+    runQuery(`INSERT INTO "user" (email, username, password_hash, isAdmin) VALUES ('u2@email.com', 'u2', '1234', 0)`);
+    runQuery(`INSERT INTO "user" (email, username, password_hash, isAdmin) VALUES ('u3@email.com', 'u3', '1234', 0)`);
+    runQuery(`INSERT INTO "user" (email, username, password_hash, isAdmin) VALUES ('u4@email.com', 'u4', '1234', 0)`);
+
     // --- Customers ---
-    runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('Alice','Smith','alice@example.com','111-222-3333')");
-    runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('Bob','Johnson','bob@example.com','222-333-4444')");
-    runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('Carol','Williams','carol@example.com','333-444-5555')");
-    runQuery("INSERT INTO customer (first_name, last_name, email, phone) VALUES ('David','Brown','david@example.com','444-555-6666')");
+    runQuery("INSERT INTO customer (first_name, last_name, email, phone, user_id) VALUES ('Alice','Smith','alice@example.com','111-222-3333', 2)");
+    runQuery("INSERT INTO customer (first_name, last_name, email, phone, user_id) VALUES ('Bob','Johnson','bob@example.com','222-333-4444', 3)");
+    runQuery("INSERT INTO customer (first_name, last_name, email, phone, user_id) VALUES ('Carol','Williams','carol@example.com','333-444-5555', 4)");
+    runQuery("INSERT INTO customer (first_name, last_name, email, phone, user_id) VALUES ('David','Brown','david@example.com','444-555-6666', 5)");
 
     // --- Orders ---
     runQuery("INSERT INTO orders (customer_id, address, status, note) VALUES (1,'123 Main St','new','First order by Alice')");
@@ -153,8 +174,9 @@ function generateSampleData() {
 
 console.log("Starting init DB");
 
+// openDb().then((db)=>{
+//     initDbSchema(db);
+//     console.log("Done init DB");
+// })
 // generateSampleData();
-const db = openDb()
-initDbSchema(db);
 
-console.log("Done init DB");

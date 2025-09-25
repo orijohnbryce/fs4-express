@@ -27,12 +27,20 @@ export default class ProductModel {
         this.price = price;
         this.stock = stock;
         this.description = description
+
+        //// for testing
+        // throw new Error("This is Test Error");
+        
     }
 
     private static validationSchema = Joi.object({
         name: Joi.string().required().min(3).max(20),
         price: Joi.number().required().positive().max(1000000),
-        sku: Joi.string().required()
+        sku: Joi.string().required(),
+        stock: Joi.number().required(),
+        description: Joi.string().optional(),
+        id: Joi.number().positive().optional(),
+        isActive: Joi.boolean().optional()
     })
 
     public validate()  {

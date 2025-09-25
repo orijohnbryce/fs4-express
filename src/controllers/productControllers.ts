@@ -2,6 +2,8 @@ import express, { NextFunction, Request, Response } from "express"
 import { addProduct, getProductById, getProducts } from "../services/productServices";
 import { StatusCode } from "../models/statusCode";
 import ProductModel from "../models/ProductModel";
+import { verifyTokenMW } from "../middlewares/verifyTokenMW";
+import { verifyTokenAdminMW } from "../middlewares/verifyTokenAdminMW";
 
 export const productRoutes = express.Router();
 
@@ -30,7 +32,7 @@ productRoutes.get("/products", async (req: Request, res: Response, next: NextFun
         res.status(200).json(products);   
 })
 
-productRoutes.post("/products", async (req: Request, res: Response, next: NextFunction)=>{
+productRoutes.post("/products", verifyTokenAdminMW, async (req: Request, res: Response, next: NextFunction)=>{
     
     const newProduct = new ProductModel(
         undefined,

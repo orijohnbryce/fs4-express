@@ -3,11 +3,13 @@ import { createOrder, getOrderByCustomerId, getOrderProducts } from "../services
 import { OrderStatus } from "../types/types";
 import { StatusCode } from "../models/statusCode";
 import { ValidationError } from "../models/exeptions";
+import { verifyTokenMW } from "../middlewares/verifyTokenMW";
 
 
 export const orderRoutes = express.Router();
 
-orderRoutes.post("/order", async (req: Request, res: Response, next: NextFunction) => {
+orderRoutes.post("/order", verifyTokenMW,  async (req: Request, res: Response, next: NextFunction) => {
+    
 
     const data = {
         customerId: req.body.customerId,
