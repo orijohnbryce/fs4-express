@@ -9,6 +9,7 @@ export default class ProductModel {
     price: number;
     stock: number;
     description?: string;
+    images?: string[];
     
 
     constructor(
@@ -18,7 +19,8 @@ export default class ProductModel {
         isActive: boolean,
         price: number,
         stock: number,
-        description?: string
+        description?: string,
+        images?: string[]
     ){
         this.id = id;
         this.sku = sku;
@@ -26,7 +28,8 @@ export default class ProductModel {
         this.isActive = isActive;
         this.price = price;
         this.stock = stock;
-        this.description = description
+        this.description = description;
+        this.images = images;
 
         //// for testing
         // throw new Error("This is Test Error");

@@ -5,6 +5,7 @@ import ProductModel from "../models/ProductModel";
 import { getAllCategoriesById } from "./categoryServices";
 import { productImagesPrefix } from "../utils/config";
 import path from "path";
+import { v4 as uuid } from "uuid";
 
 
 export async function getProductsPaged(page: number = 1, limit: number = 5) {
@@ -140,11 +141,10 @@ export async function updateProduct(p: ProductModel) {
 
 export async function saveProductImage(productId: number, image: UploadedFile): Promise<string> {
 
-    const imageName = image.name;
-    // console.log(image.name);
-    // return ""
-    
-    
+    // my_file.txt
+    const uuidString = uuid();
+    const lastDot = image.name.lastIndexOf(".")
+    const imageName = uuidString + image.name.substring(lastDot);            
     const fullPath = path.join(productImagesPrefix, imageName);
 
     await image.mv(fullPath);
@@ -157,3 +157,4 @@ export async function saveProductImage(productId: number, image: UploadedFile): 
     return fullPath;
 
 }
+
