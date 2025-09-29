@@ -1,4 +1,4 @@
-import { ValidationError } from "./exeptions";
+import { ValidationError } from "./exceptions";
 import Joi from "joi";
 
 export default class ProductModel {

@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from "express"
 import { createOrder, getOrderByCustomerId, getOrderProducts } from "../services/orderServices";
 import { OrderStatus } from "../types/types";
 import { StatusCode } from "../models/statusCode";
-import { ValidationError } from "../models/exeptions";
+import { ValidationError } from "../models/exceptions";
 import { verifyTokenMW } from "../middlewares/verifyTokenMW";
 
 

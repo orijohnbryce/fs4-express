@@ -5,6 +5,7 @@ export function verifyTokenAdminMW(req: Request, res: Response, next: NextFuncti
 
     // console.log(req.header("Authorization").substring(7));
     const token = req.header("Authorization")?.substring(7);
-    verifyToken(token, true);
+    const user = verifyToken(token, true);        
+    res.locals.user = user;
     next();
 }

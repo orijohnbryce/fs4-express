@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from "express"
-import { addProduct, getProductById, getProducts } from "../services/productServices";
+import { addProduct, getProductById, getProducts, getProductsPaged } from "../services/productServices";
 import { StatusCode } from "../models/statusCode";
 import ProductModel from "../models/ProductModel";
 import { verifyTokenMW } from "../middlewares/verifyTokenMW";
@@ -7,8 +7,16 @@ import { verifyTokenAdminMW } from "../middlewares/verifyTokenAdminMW";
 
 export const productRoutes = express.Router();
 
+
+productRoutes.get("/products-paged", async (req: Request, res: Response, next: NextFunction) => {
+    const page = Number(req.query.page);
+    const products = await getProductsPaged(page);
+    res.status(StatusCode.Ok).json(products);
+})
+
+
 productRoutes.get("/products/:id", async (req: Request, res: Response, next: NextFunction) => {
-    try {        
+    try {
         const pid = Number(req.params.id);
         if (isNaN(pid)) {
             res.status(StatusCode.BadRequest).send("id must be positive number")
@@ -22,18 +30,18 @@ productRoutes.get("/products/:id", async (req: Request, res: Response, next: Nex
     }
 })
 
-productRoutes.get("/products", async (req: Request, res: Response, next: NextFunction) => {    
-        const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
-        const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
-        const name = req.query.name ? String(req.query.name) : undefined;
-        const categoryId = req.query.categoryId ? Number(req.query.categoryId) : undefined;
-        // (name?: string, minPrice?: number, maxPrice?: number, categoryId?: number)
-        const products = await getProducts(name, minPrice, maxPrice, categoryId);
-        res.status(200).json(products);   
+productRoutes.get("/products", async (req: Request, res: Response, next: NextFunction) => {
+    const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
+    const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
+    const name = req.query.name ? String(req.query.name) : undefined;
+    const categoryId = req.query.categoryId ? Number(req.query.categoryId) : undefined;
+    // (name?: string, minPrice?: number, maxPrice?: number, categoryId?: number)
+    const products = await getProducts(name, minPrice, maxPrice, categoryId);
+    res.status(200).json(products);
 })
 
-productRoutes.post("/products", verifyTokenAdminMW, async (req: Request, res: Response, next: NextFunction)=>{
-    
+productRoutes.post("/products", verifyTokenAdminMW, async (req: Request, res: Response, next: NextFunction) => {
+
     const newProduct = new ProductModel(
         undefined,
         req.body.sku,

@@ -1,7 +1,42 @@
 import { runQuery } from "../dal/dal";
-import { NotFoundError } from "../models/exeptions";
+import { NotFoundError } from "../models/exceptions";
 import ProductModel from "../models/ProductModel";
 import { getAllCategoriesById } from "./categoryServices";
+
+
+export async function getProductsPaged(page: number = 1, limit: number = 5) {
+
+    const q = `SELECT * FROM product LIMIT(${limit}) OFFSET(${(page - 1) * limit})`;
+
+    const res = await runQuery(q) as ProductModel[];
+    const products = [];
+    res.map((row) => products.push(new ProductModel(
+        row.id,
+        row.sku,
+        row.name,
+        row.isActive,
+        row.price,
+        row.stock,
+        row.description
+    )))
+
+    const countQ = "select count(id) as count from product";
+    const countRes = await runQuery(countQ) as any;
+    console.log(countRes);
+
+    const pagedRes :any = {
+        total: countRes[0].count,
+        page: page,
+        results: products,
+    }
+
+    if (page * limit < (countRes[0].count)){
+        pagedRes.next =  `http://localhost:3030/products-paged?page=${page + 1}`
+    }
+
+    return pagedRes
+}
+
 
 export async function getProductById(id: number): Promise<ProductModel | null> {
     const q = `SELECT * FROM product WHERE id=${id}`
@@ -12,7 +47,7 @@ export async function getProductById(id: number): Promise<ProductModel | null> {
         // return null;
         // throw new Error("Product not found!");
         throw new NotFoundError(`Product with id ${id} not found!`)
-    
+
 
     const p = new ProductModel(
         row.id,
@@ -66,7 +101,7 @@ export async function deleteProduct(productId: number): Promise<void> {
 
 // export async function addProduct(product: Omit<ProductModel, 'id'>) {
 export async function addProduct(product: Partial<ProductModel>) {
-        
+
     product.validate();
 
     const q = `INSERT INTO product 
@@ -81,7 +116,7 @@ export async function addProduct(product: Partial<ProductModel>) {
     )
     `
     console.log(q);
-    
+
     const res = await runQuery(q) as any;
     return res.lastInsertRowid;
 }

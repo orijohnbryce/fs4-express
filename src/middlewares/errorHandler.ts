@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AppException } from "../models/exeptions";
+import { AppException } from "../models/exceptions";
 import { StatusCode } from "../models/statusCode";
 import { logIt } from "../utils/helpers/logHelpers";
 

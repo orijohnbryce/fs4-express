@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { ValidationError } from "./exeptions";
+import { ValidationError } from "./exceptions";
 
 class UserModel {
     id?: number;

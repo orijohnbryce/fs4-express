@@ -68,7 +68,9 @@ def echo_all_files(
 
 if __name__ == "__main__":
     echo_all_files(
-        r"C:\Users\Jbt\Desktop\ori\express_ts\src",
+        # r"C:\Users\Jbt\Desktop\ori\express_ts\src",
+        r"C:\Users\Jbt\Desktop\ori\express_ts\src\services",
+
         ignore_exts=[
             "css",
             # "js",

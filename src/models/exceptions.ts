@@ -17,8 +17,9 @@ export class ValidationError extends AppException {
 }
 
 export class UnknownError extends AppException {
-    constructor(){
-        super(StatusCode.ServerError, "internal sever error!");
+    constructor(optionalMsg?: string){
+        const msg = optionalMsg ? optionalMsg : "internal sever error!"
+        super(StatusCode.ServerError, msg);
     }
 }
 
