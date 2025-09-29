@@ -53,6 +53,11 @@ export async function getProductById(id: number): Promise<ProductModel | null> {
         // throw new Error("Product not found!");
         throw new NotFoundError(`Product with id ${id} not found!`)
 
+    const imagesQ = `SELECT image_path FROM product_image
+                     WHERE product_id=${id}`;
+    
+    const imagesRows = await runQuery(imagesQ) as {image_path: string}[];
+    const imagePaths = imagesRows.map((im)=> `http://localhost:3030/product-image/${im.image_path}`);
 
     const p = new ProductModel(
         row.id,
@@ -61,7 +66,8 @@ export async function getProductById(id: number): Promise<ProductModel | null> {
         row.isActive,
         row.price,
         row.stock,
-        row.description
+        row.description,
+        imagePaths,
     )
     return p;
 }
@@ -149,7 +155,7 @@ export async function saveProductImage(productId: number, image: UploadedFile): 
 
     await image.mv(fullPath);
 
-    const q = `INSERT INTO product_image (product_id, image_path)  VALUES (${productId}, '${fullPath}')`;
+    const q = `INSERT INTO product_image (product_id, image_path)  VALUES (${productId}, '${imageName}')`;
 
     console.log(q);
     
