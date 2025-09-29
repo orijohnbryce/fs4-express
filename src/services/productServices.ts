@@ -1,7 +1,10 @@
+import { UploadedFile } from "express-fileupload";
 import { runQuery } from "../dal/dal";
 import { NotFoundError } from "../models/exceptions";
 import ProductModel from "../models/ProductModel";
 import { getAllCategoriesById } from "./categoryServices";
+import { productImagesPrefix } from "../utils/config";
+import path from "path";
 
 
 export async function getProductsPaged(page: number = 1, limit: number = 5) {
@@ -24,14 +27,15 @@ export async function getProductsPaged(page: number = 1, limit: number = 5) {
     const countRes = await runQuery(countQ) as any;
     console.log(countRes);
 
-    const pagedRes :any = {
+    const pagedRes: any = {
         total: countRes[0].count,
         page: page,
+        limit: limit,
         results: products,
     }
 
-    if (page * limit < (countRes[0].count)){
-        pagedRes.next =  `http://localhost:3030/products-paged?page=${page + 1}`
+    if (page * limit < (countRes[0].count)) {
+        pagedRes.next = `http://localhost:3030/products-paged?page=${page + 1}`
     }
 
     return pagedRes
@@ -132,4 +136,24 @@ export async function updateProduct(p: ProductModel) {
     description = '${p.description || "NULL"}'
     `
     await runQuery(q);
+}
+
+export async function saveProductImage(productId: number, image: UploadedFile): Promise<string> {
+
+    const imageName = image.name;
+    // console.log(image.name);
+    // return ""
+    
+    
+    const fullPath = path.join(productImagesPrefix, imageName);
+
+    await image.mv(fullPath);
+
+    const q = `INSERT INTO product_image (product_id, image_path)  VALUES (${productId}, '${fullPath}')`;
+
+    console.log(q);
+    
+    await runQuery(q);
+    return fullPath;
+
 }

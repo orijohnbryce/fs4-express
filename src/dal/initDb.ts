@@ -38,6 +38,14 @@ CREATE TABLE IF NOT EXISTS product (
     description TEXT    
 );
 
+CREATE TABLE IF NOT EXISTS product_image (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL,
+    image_path TEXT NOT NULL,
+
+    FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     customer_id INTEGER NOT NULL,
@@ -174,9 +182,9 @@ function generateSampleData() {
 
 console.log("Starting init DB");
 
-// openDb().then((db)=>{
-//     initDbSchema(db);
-//     console.log("Done init DB");
-// })
+openDb().then((db)=>{
+    initDbSchema(db);
+    console.log("Done init DB");
+})
 // generateSampleData();
 

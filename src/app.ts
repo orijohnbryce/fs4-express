@@ -5,10 +5,12 @@ import { orderRoutes } from "./controllers/orderControllers";
 import { errorHandler } from "./middlewares/errorHandler";
 import { logMiddleware } from "./middlewares/logMiddleware";
 import { authRouter } from "./controllers/userControllers";
+import fileUpload from "express-fileupload";
 
 const server = express();
 
 server.use(express.json()); // load body into "request" object
+server.use(fileUpload())
 server.use(logMiddleware)
 
 server.use(productRoutes);

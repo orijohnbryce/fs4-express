@@ -1,19 +1,20 @@
 import express, { NextFunction, Request, Response } from "express"
-import { addProduct, getProductById, getProducts, getProductsPaged } from "../services/productServices";
+import { addProduct, getProductById, getProducts, getProductsPaged, saveProductImage } from "../services/productServices";
 import { StatusCode } from "../models/statusCode";
 import ProductModel from "../models/ProductModel";
 import { verifyTokenMW } from "../middlewares/verifyTokenMW";
 import { verifyTokenAdminMW } from "../middlewares/verifyTokenAdminMW";
+import fileUpload from "express-fileupload";
+import { ValidationError } from "../models/exceptions";
 
 export const productRoutes = express.Router();
 
-
 productRoutes.get("/products-paged", async (req: Request, res: Response, next: NextFunction) => {
     const page = Number(req.query.page);
-    const products = await getProductsPaged(page);
+    const limit = Number(req.query.limit);
+    const products = await getProductsPaged(page || 1, limit || 5);
     res.status(StatusCode.Ok).json(products);
 })
-
 
 productRoutes.get("/products/:id", async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -54,4 +55,21 @@ productRoutes.post("/products", verifyTokenAdminMW, async (req: Request, res: Re
 
     const newId = await addProduct(newProduct);
     res.status(StatusCode.Ok).send(newId);
+})
+
+productRoutes.post("/product-image/:productId", verifyTokenAdminMW, async (req: Request, res: Response, next: NextFunction)=>{
+    const productId = Number(req.params.productId);
+
+    const files = req.files as {[fieldname: string]: fileUpload.UploadedFile};
+    const image = files?.["image"];
+
+    if (!image)
+        throw new ValidationError("'image' is require");
+
+    const imagePath = await saveProductImage(productId, image);
+
+    res.status(StatusCode.Created).json({
+        message: "image added",
+        imagePath
+    })
 })
