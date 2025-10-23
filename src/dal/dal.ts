@@ -21,7 +21,7 @@ export async function openDb(dbFile: string = DB_FILE): DB {
 
 export async function runQuery(
     sql: string,
-    // params: Record<string, unknown> | unknown[] = []
+    params: Record<string, unknown> | unknown[] = []
 ): Promise<unknown[] | { changes: number; lastInsertRowid: number | bigint }> {
 
     // console.log("about to run:");
@@ -39,8 +39,8 @@ export async function runQuery(
     // better-sqlite3 exposes whether the statement reads rows
     if ((stmt as any).reader === true) {
         // SELECT
-        return stmt.all();
-        // return Array.isArray(params) ? stmt.all(...params) : stmt.all(params);
+        // return stmt.all();  // sql-injection מסוכן        
+        return Array.isArray(params) ? stmt.all(...params) : stmt.all(params);
     } else {
         // INSERT/UPDATE/DELETE
         // const res: RunResult = Array.isArray(params)

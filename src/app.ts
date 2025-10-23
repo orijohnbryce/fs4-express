@@ -6,8 +6,15 @@ import { errorHandler } from "./middlewares/errorHandler";
 import { logMiddleware } from "./middlewares/logMiddleware";
 import { authRouter } from "./controllers/userControllers";
 import fileUpload from "express-fileupload";
+import cors from "cors";
 
 const server = express();
+
+// server.use(cors()) //  Allow All origins
+
+server.use(cors({origin: [
+    "http://127.0.0.1:3000"    
+]}))
 
 server.use(express.json()); // load body into "request" object
 server.use(fileUpload())

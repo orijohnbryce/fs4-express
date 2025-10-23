@@ -24,11 +24,13 @@ export async function createUser(user: Partial<UserModel>): Promise<string> {
 export async function login(email: string, password: string): Promise<string> {
     /* If given credentials are ok, generate and return new token  */
 
-    const q = `SELECT * FROM "user" 
-                WHERE email='${email}' 
-                AND password_hash='${password}'`
+    // sql-injection risk
+    // const q = `SELECT * FROM "user" WHERE email='${email}' AND password_hash='${password}'`
+    // "email": "admin@email.com' -- "  // sql injection risk
 
-    const res = await runQuery(q) as any;
+    // sql-injection protected:
+    const q = `SELECT * FROM "user" WHERE email=? AND password_hash=?`        
+    const res = await runQuery(q, [email, password]) as any;
 
     if (res.length !== 1)
         throw new UnauthorizedError();
@@ -57,5 +59,5 @@ export async function deleteUser(id: number) {
     // 1. need to delete all orders that belong to customer that linked to user
     // 2. need to delete the customer that linked to the user
     // 3. delete the user
-    throw new UnknownError("Not Implemented Yet");    
+    throw new UnknownError("Not Implemented Yet");
 }
