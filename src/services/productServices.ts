@@ -3,9 +3,10 @@ import { runQuery } from "../dal/dal";
 import { NotFoundError } from "../models/exceptions";
 import ProductModel from "../models/ProductModel";
 import { getAllCategoriesById } from "./categoryServices";
-import { productImagesPrefix } from "../utils/config";
+// import { productImagesPrefix } from "../utils/config";
 import path from "path";
 import { v4 as uuid } from "uuid";
+import { appConfig } from "../utils/config";
 
 
 export async function getProductsPaged(page: number = 1, limit: number = 5) {
@@ -44,8 +45,8 @@ export async function getProductsPaged(page: number = 1, limit: number = 5) {
 
 
 export async function getProductById(id: number): Promise<ProductModel | null> {
-    const q = `SELECT * FROM product WHERE id=${id}`
-    const res = await runQuery(q) as ProductModel[];
+    const q = `SELECT * FROM product WHERE id=?`
+    const res = await runQuery(q, [id]) as ProductModel[];
     const row = res[0]
 
     if (res.length == 0)
@@ -54,9 +55,9 @@ export async function getProductById(id: number): Promise<ProductModel | null> {
         throw new NotFoundError(`Product with id ${id} not found!`)
 
     const imagesQ = `SELECT image_path FROM product_image
-                     WHERE product_id=${id}`;
+                     WHERE product_id=?`;
     
-    const imagesRows = await runQuery(imagesQ) as {image_path: string}[];
+    const imagesRows = await runQuery(imagesQ, [id]) as {image_path: string}[];
     const imagePaths = imagesRows.map((im)=> `http://localhost:3030/product-image/${im.image_path}`);
 
     const p = new ProductModel(
@@ -81,16 +82,26 @@ export async function getProducts(name?: string, minPrice?: number, maxPrice?: n
     } else {
         q += ` WHERE p.is_active=1`
     }
-    if (name)
+
+    const params = []
+
+    if (name){
         q += ` AND p.name LIKE '%${name}%'`
+        params.push(name);
+    }
 
-    if (minPrice != undefined)
+    if (minPrice != undefined){
         q += ` AND p.price >= ${minPrice}`
+        params.push(minPrice)
+    }
 
-    if (maxPrice != undefined)
+    if (maxPrice != undefined){
         q += ` AND p.price <= ${maxPrice}`
+        params.push(maxPrice)
+    }
 
-    const res = await runQuery(q) as ProductModel[];
+    const res = await runQuery(q, params) as ProductModel[];
+
     const products = [];
     res.map((row) => products.push(new ProductModel(
         row.id,
@@ -106,8 +117,8 @@ export async function getProducts(name?: string, minPrice?: number, maxPrice?: n
 }
 
 export async function deleteProduct(productId: number): Promise<void> {
-    const q = `DELETE FROM product WHERE ID = ${productId}`;
-    await runQuery(q);
+    const q = `DELETE FROM product WHERE ID = ?`;
+    await runQuery(q, [productId]);
 }
 
 // export async function addProduct(product: Omit<ProductModel, 'id'>) {
@@ -151,7 +162,7 @@ export async function saveProductImage(productId: number, image: UploadedFile): 
     const uuidString = uuid();
     const lastDot = image.name.lastIndexOf(".")
     const imageName = uuidString + image.name.substring(lastDot);            
-    const fullPath = path.join(productImagesPrefix, imageName);
+    const fullPath = path.join(appConfig.productImagesPrefix, imageName);
 
     await image.mv(fullPath);
 

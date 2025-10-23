@@ -1,7 +1,8 @@
 import UserModel from "../../models/UserModel";
 import jwt from "jsonwebtoken";
-import { tokenSecretKey } from "../config";
+// import { tokenSecretKey } from "../config";
 import { UnauthorizedError } from "../../models/exceptions";
+import { appConfig } from "../config";
 
 export function createToken(user: Partial<UserModel>): string {
     const userWithoutPassword = {...user}
@@ -9,7 +10,7 @@ export function createToken(user: Partial<UserModel>): string {
 
     const container = { userWithoutPassword };
     
-    const token = jwt.sign(container, tokenSecretKey)
+    const token = jwt.sign(container, appConfig.tokenSecretKey)
 
     return token;
 }
@@ -17,7 +18,7 @@ export function createToken(user: Partial<UserModel>): string {
 
 export function verifyToken(token:string, adminRequired: boolean=false) {
     try {        
-        const res = jwt.verify(token, tokenSecretKey) as {userWithoutPassword: UserModel};
+        const res = jwt.verify(token, appConfig.tokenSecretKey) as {userWithoutPassword: UserModel};
 
         if (adminRequired && !res.userWithoutPassword.isAdmin)
             throw "sdf"; // we don't care about this error. it will re-raise from the catch

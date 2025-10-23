@@ -1,9 +1,10 @@
 import fs from "fs";
 import Database, { Database as DB, RunResult } from "better-sqlite3";
-import { DB_FILE } from "../utils/config";
+import { appConfig } from "../utils/config";
+// import { DB_FILE } from "../utils/config";
 
 
-export async function openDb(dbFile: string = DB_FILE): DB {
+export async function openDb(dbFile: string = appConfig.DB_FILE): DB {
 
     if (!fs.existsSync(dbFile)) {
         fs.writeFileSync(dbFile, "");
@@ -43,10 +44,10 @@ export async function runQuery(
         return Array.isArray(params) ? stmt.all(...params) : stmt.all(params);
     } else {
         // INSERT/UPDATE/DELETE
-        // const res: RunResult = Array.isArray(params)
-        //     ? stmt.run(...params)
-        //     : stmt.run(params);
-        const res: RunResult = stmt.run();
+        const res: RunResult = Array.isArray(params)
+            ? stmt.run(...params)
+            : stmt.run(params);
+        // const res: RunResult = stmt.run();
         return { changes: res.changes, lastInsertRowid: res.lastInsertRowid };
     }
 

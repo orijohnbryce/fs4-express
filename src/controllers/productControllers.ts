@@ -6,8 +6,9 @@ import { verifyTokenMW } from "../middlewares/verifyTokenMW";
 import { verifyTokenAdminMW } from "../middlewares/verifyTokenAdminMW";
 import fileUpload from "express-fileupload";
 import { ValidationError } from "../models/exceptions";
-import { productImagesPrefix } from "../utils/config";
+// import { productImagesPrefix } from "../utils/config";
 import path from "path";
+import { appConfig } from "../utils/config";
 
 export const productRoutes = express.Router();
 
@@ -78,6 +79,6 @@ productRoutes.post("/product-image/:productId", verifyTokenAdminMW, async (req: 
 
 
 productRoutes.get("/product-image/:imagePath", async (req: Request, res: Response, next: NextFunction)=>{
-    const imageFullPath = path.resolve(productImagesPrefix, req.params.imagePath);
+    const imageFullPath = path.resolve(appConfig.productImagesPrefix, req.params.imagePath);
     res.sendFile(imageFullPath);
 })
