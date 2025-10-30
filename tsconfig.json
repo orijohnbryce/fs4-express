@@ -3,6 +3,7 @@
         "target": "ES6",
         "esModuleInterop": true,
         "moduleResolution": "node",
-        "outDir": "dist"
+        "outDir": "dist",
+        "module": "CommonJS"
     }
 }
