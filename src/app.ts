@@ -10,6 +10,19 @@ import cors from "cors";
 import expressRateLimit from "express-rate-limit";
 
 import { appConfig } from "./utils/config";
+import { isDBup } from "./utils/helpers/generalHelpers";
+
+
+isDBup().then(res=>{
+    if(!res){
+        throw new Error("DB server is not up!!")    
+    }
+    else{ console.log("DB is working!");}
+})
+// if (!isDBup()){
+//     throw new Error("DB server is not up!!")
+// } else{ console.log("DB is working!");
+// }
 
 const server = express();
 

@@ -43,7 +43,8 @@ export default class ProductModel {
         stock: Joi.number().required(),
         description: Joi.string().optional(),
         id: Joi.number().positive().optional(),
-        isActive: Joi.boolean().optional()
+        isActive: Joi.boolean().optional(),
+        images: Joi.optional()
     })
 
     public validate()  {

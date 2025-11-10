@@ -43,7 +43,6 @@ export async function getProductsPaged(page: number = 1, limit: number = 5) {
     return pagedRes
 }
 
-
 export async function getProductById(id: number): Promise<ProductModel | null> {
     const q = `SELECT * FROM product WHERE id=?`
     const res = await runQuery(q, [id]) as ProductModel[];
@@ -78,9 +77,9 @@ export async function getProducts(name?: string, minPrice?: number, maxPrice?: n
 
     if (categoryId != undefined) {
         const categoryIds = await getAllCategoriesById(categoryId);
-        q += ` JOIN product_category pc ON  pc.product_id = p.id WHERE pc.category_id IN (${categoryIds.join(",")}) AND p.is_active=1`;
+        q += ` JOIN product_category pc ON  pc.product_id = p.id WHERE pc.category_id IN (${categoryIds.join(",")}) AND p.is_active=true`;
     } else {
-        q += ` WHERE p.is_active=1`
+        q += ` WHERE p.is_active=true`
     }
 
     const params = []
@@ -131,16 +130,19 @@ export async function addProduct(product: Partial<ProductModel>) {
     VALUES (
         '${product.sku}',
         '${product.name}',
-        ${product.isActive ? 1 : 0},
+        ${product.isActive},
         ${product.price},
         ${product.stock},
         '${product.description || ''}'
-    )
-    `
-    console.log(q);
+    );
+    `    
 
     const res = await runQuery(q) as any;
-    return res.lastInsertRowid;
+    const new_id = await runQuery(`select id from product where sku='${product.sku}';`);
+    console.log(new_id);
+    
+    return new_id;
+    // return res.lastInsertRowid;
 }
 
 export async function updateProduct(p: ProductModel) {

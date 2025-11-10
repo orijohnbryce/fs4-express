@@ -50,13 +50,15 @@ productRoutes.post("/products", verifyTokenAdminMW, async (req: Request, res: Re
         undefined,
         req.body.sku,
         req.body.name,
-        req.body.isActive ? req.body.isActive : 1,
+        req.body.isActive ? req.body.isActive : true,
         req.body.price,
         req.body.stock,
         req.body.description
     )
 
     const newId = await addProduct(newProduct);
+    console.log(newId);
+    
     res.status(StatusCode.Ok).send(newId);
 })
 
