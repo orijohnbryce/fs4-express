@@ -1,5 +1,5 @@
 import { getDbClient, runQuery } from "./dal";
-
+import bcrypt from "bcrypt"
 
 async function initDbSchema() {
     const ddl = `
@@ -109,8 +109,9 @@ async function generateSampleData(){
     
     const dbClient = await getDbClient();
     try {        
+        const passwordHash = await bcrypt.hash("admin" + process.env.HASH_PEPPER, 12)
         runQuery("BEGIN;", [], dbClient);            
-        runQuery(`INSERT INTO app_user (email, username, password_hash, is_admin) VALUES ('admin@email.com', 'admin', 'admin', true)`);            
+        runQuery(`INSERT INTO app_user (email, username, password_hash, is_admin) VALUES ('admin@email.com', 'admin', '${passwordHash}', true)`);            
         runQuery("COMMIT;", [], dbClient);
     } catch (error) {
         runQuery("ROLLBACK", [], dbClient);

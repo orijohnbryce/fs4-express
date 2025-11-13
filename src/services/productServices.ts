@@ -134,14 +134,15 @@ export async function addProduct(product: Partial<ProductModel>) {
         ${product.price},
         ${product.stock},
         '${product.description || ''}'
-    );
+    ) RETURNING id;
     `    
 
     const res = await runQuery(q) as any;
-    const new_id = await runQuery(`select id from product where sku='${product.sku}';`);
-    console.log(new_id);
+
+    // const new_id = await runQuery(`select id from product where sku='${product.sku}';`);
+    // console.log(new_id);
     
-    return new_id;
+    return res;
     // return res.lastInsertRowid;
 }
 

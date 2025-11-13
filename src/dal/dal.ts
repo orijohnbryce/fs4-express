@@ -1,16 +1,23 @@
 import { appConfig } from "../utils/config";
 import { Pool } from "pg";
 
-export async function openDb() {}
+export async function openDb() { }
 
-const pool = new Pool({ connectionString: appConfig.DB_URL, })
+const pool = new Pool({
+    connectionString: appConfig.DB_URL,
+    // ssl: {
+    //     rejectUnauthorized: false  // For testing. Use proper CA in production.
+    // }
+})
 
 export async function getDbClient() {
     return pool.connect();
 }
 
-export async function runQuery(q: string, params: any[] = [], client: any=undefined) {
+export async function runQuery(q: string, params: any[] = [], client: any = undefined) {
     const executor = client || pool;
     const res = await executor.query(q);
-    return  res.command === "SELECT" ? res.rows :  { changes: res.rowCount, lastInsertRowid: res.rows?.[0]?.id };    
+    return res.command === "SELECT" ? res.rows : { changes: res.rowCount, lastInsertRowid: res.rows?.[0]?.id };
 }
+
+// runQuery("select version();").then(res => console.log(res));
