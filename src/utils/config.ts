@@ -10,6 +10,14 @@ class BaseConfig {
     productImagesPrefix = path.resolve(__dirname, "..", "..", "assets", "images")
     tokenSecretKey = process.env.TOKEN_SECRET_KEY;
     DB_PORT = 5432;
+
+    readonly s3_config = {
+        key: process.env.S3_KEY,
+        secret: process.env.S3_SECRET,
+        region: "eu-central-1",
+        bucket_name: "class63bucket",
+        image_folder: "myFolder"
+    }
 }
 
 class DevConfig extends BaseConfig {
