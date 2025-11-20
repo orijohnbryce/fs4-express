@@ -7,7 +7,10 @@ import { getAllCategoriesById } from "./categoryServices";
 import path from "path";
 import { v4 as uuid } from "uuid";
 import { appConfig } from "../utils/config";
-
+import { uploadToS3, uploadToS3Readable } from "../utils/helpers/s3Helpers";
+import fs from "fs";
+import { unlink } from "fs/promises";
+import { Readable } from "stream";
 
 export async function getProductsPaged(page: number = 1, limit: number = 5) {
 
@@ -167,14 +170,30 @@ export async function saveProductImage(productId: number, image: UploadedFile): 
     const imageName = uuidString + image.name.substring(lastDot);            
     const fullPath = path.join(appConfig.productImagesPrefix, imageName);
 
-    await image.mv(fullPath);
 
+    ////////////  Old code - upload to S3 from disk.
+    // // save to disk
+    // await image.mv(fullPath);
+
+    // // upload from disk to s3
+    // await uploadToS3(fullPath, imageName)
+
+    // // remove from disk
+    // await unlink(fullPath)
+
+
+    /////////////// New Code - upload to S3 by Readable:
+    const fileStream = Readable.from(image.data);
+    await uploadToS3Readable(fileStream, imageName);
+    
     const q = `INSERT INTO product_image (product_id, image_path)  VALUES (${productId}, '${imageName}')`;
 
     console.log(q);
     
     await runQuery(q);
-    return fullPath;
+    // return fullPath;
+    
+    return appConfig.s3_config.objectsPrefix + imageName;
 
 }
 

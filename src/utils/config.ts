@@ -16,7 +16,8 @@ class BaseConfig {
         secret: process.env.S3_SECRET,
         region: "eu-central-1",
         bucket_name: "class63bucket",
-        image_folder: "myFolder"
+        image_folder: "myFolder",
+        objectsPrefix: "https://class63bucket.s3.eu-central-1.amazonaws.com/myFolder/",
     }
 }
 
