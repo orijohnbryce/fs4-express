@@ -13,6 +13,7 @@ export default function handleSocketIo(httpSever: Server) {
             console.log("New message to WS: " + msg);
             
             socket.emit("server-msg", "This is cool response " + String(Math.random()));
+            // socketServer.sockets.emit("server-msg")
         })
         socket.on("smile", (msg: string)=>{                        
             socket.emit("server-msg", "😎");
