@@ -3,12 +3,19 @@ import { Pool } from "pg";
 
 export async function openDb() { }
 
-const pool = new Pool({
-    connectionString: appConfig.DB_URL,
-    // ssl: {
-    //     rejectUnauthorized: false  // For testing. Use proper CA in production.
-    // }
-})
+let pool: any;
+if (Number(process.env.IS_PROD) === 1) {
+    pool = new Pool({
+        connectionString: appConfig.DB_URL,
+        ssl: {
+            rejectUnauthorized: false  // For testing. Use proper CA in production.
+        }
+    })
+} else {
+    pool = new Pool({
+        connectionString: appConfig.DB_URL,
+    })
+}
 
 export async function getDbClient() {
     return pool.connect();
