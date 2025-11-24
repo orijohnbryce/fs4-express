@@ -1,19 +1,15 @@
 import express, { NextFunction, Request, Response } from "express"
-import path from "path";
+import handleSocketIo from "./services/socket-services"
 
+const expressServer = express()
 
-const server = express()
+expressServer.use(express.json()) // load body into "request" object
 
-server.use(express.json()) // load body into "request" object
-
-server.get("/", (request: Request, response: Response, next: NextFunction) => {        
+expressServer.get("/", (request: Request, response: Response, next: NextFunction) => {        
     response.status(200).send("hello world!")
 })
 
-server.post("/post-example", (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.body);    
-    res.status(200).send("OK")
-})
 
+const httpsServer = expressServer.listen(4000, () => console.log("Express server started.\nhttp://localhost:4000"));
 
-server.listen(3030, () => console.log("Express server started.\nhttp://localhost:3030"));
+handleSocketIo(httpsServer);
