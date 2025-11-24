@@ -4,3 +4,4 @@ package-lock.json
 echo.txt
 ttd*
 .env
+/dist*

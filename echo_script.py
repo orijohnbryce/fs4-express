@@ -69,7 +69,8 @@ def echo_all_files(
 if __name__ == "__main__":
     echo_all_files(
         # r"C:\Users\Jbt\Desktop\ori\express_ts\src",
-        r"C:\Users\Jbt\Desktop\ori\express_ts\src",
+        # r"C:\Users\Jbt\Desktop\ori\express_ts\src",
+        r"C:\Users\Jbt\Desktop\ori\express_ts\src\controllers",
 
         ignore_exts=[
             "css",
@@ -81,6 +82,7 @@ if __name__ == "__main__":
             "json",
             "svg",
             "jpeg",
+            "db"
         ],
         # file_name_includes=["ilter"]
         exclude_files=["requirements", "ttd"],
